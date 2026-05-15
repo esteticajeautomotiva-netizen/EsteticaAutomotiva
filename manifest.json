@@ -2,8 +2,8 @@
   "name": "J&E Estética Automotiva",
   "short_name": "J&E",
   "description": "Agendamento de estética automotiva premium",
-  "start_url": "/index.html",
-  "scope": "/",
+  "start_url": "/EsteticaAutomotiva/index.html",
+  "scope": "/EsteticaAutomotiva/",
   "display": "standalone",
   "background_color": "#080808",
   "theme_color": "#D4AF37",
@@ -12,25 +12,25 @@
   "categories": ["lifestyle", "utilities"],
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "/EsteticaAutomotiva/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-192.png",
+      "src": "/EsteticaAutomotiva/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/EsteticaAutomotiva/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "/EsteticaAutomotiva/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
