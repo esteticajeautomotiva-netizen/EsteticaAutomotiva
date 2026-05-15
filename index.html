@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>J&amp;E Estética Automotiva</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#D4AF37">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/vars.css">
+<link rel="stylesheet" href="css/client.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ========== INÍCIO ========== -->
+  <div class="pg on" id="pg-inicio">
+    <div class="hero">
+      <div class="logo"><img src="https://res.cloudinary.com/dmqtygmro/image/upload/v1778716782/WhatsApp_Image_2026-05-07_at_22.51.51_fac8lq.jpg" alt="J&E Estética Automotiva"></div>
+      <div class="tag">Guarulhos · SP</div>
+      <h1>Estética <span>Automotiva</span></h1>
+      <p>Qualidade e cuidado premium para o seu veículo.</p>
+      <div class="hero-btns">
+        <button class="btn btn-gold btn-lg btn-blk" onclick="nav('servicos')">📅 Agendar Agora</button>
+        <a class="btn btn-maps btn-blk" data-maps href="#">
+          <span class="maps-bg" style="background-image:url('https://res.cloudinary.com/dmqtygmro/image/upload/v1778807793/maps_qk9zqn.png')"></span>
+          <span class="maps-label">📍 Como Chegar</span>
+        </a>
+      </div>
+      <div class="hero-cards">
+        <div class="hcard"><div class="i">⏰</div><div class="l">Funcionamento</div><div class="v" id="hero-horario">Seg–Sáb</div></div>
+        <div class="hcard"><div class="i">📍</div><div class="l">Localização</div><div class="v">Guarulhos SP</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== SERVIÇOS ========== -->
+  <div class="pg" id="pg-servicos">
+    <div class="ph">
+      <h2>Nossos <span>Serviços</span></h2>
+      <p>Toque para selecionar — pode escolher mais de um</p>
+    </div>
+    <div class="sgrid" id="services-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:#8A9BB8"><span class="sp"></span></div>
+    </div>
+    <div class="spec-sec">👨‍🔧 Especialista</div>
+    <div class="spec-row" id="specialists-row">
+      <div style="color:#8A9BB8;font-size:13px;padding:10px">Carregando...</div>
+    </div>
+    <div class="cont-btn">
+      <button class="btn btn-gold btn-blk btn-lg" onclick="nav('agendar')">📅 Ir para Agendamento →</button>
+    </div>
+  </div>
+
+  <!-- ========== AGENDAR ========== -->
+  <div class="pg" id="pg-agendar">
+    <div class="ph"><h2>Fazer <span>Agendamento</span></h2><p>Preencha para reservar seu horário</p></div>
+
+    <!-- Passo 1: Serviços selecionados -->
+    <div class="bstep">
+      <div class="slbl"><span class="snum">1</span> Serviços Selecionados</div>
+      <div id="sum-service-preview" style="display:flex;flex-direction:column;gap:6px">
+        <span style="color:#8A9BB8;font-size:13px">Nenhum serviço selecionado ainda</span>
+      </div>
+      <button class="btn btn-out btn-sm" onclick="nav('servicos')" style="margin-top:10px">← Adicionar / Alterar Serviços</button>
+    </div>
+
+    <!-- Passo 2: Data -->
+    <div class="bstep">
+      <div class="slbl"><span class="snum">2</span> Escolha a Data</div>
+      <div class="drow" id="date-picker"><p style="color:#8A9BB8;font-size:13px">Carregando...</p></div>
+    </div>
+
+    <!-- Passo 3: Horário -->
+    <div class="bstep">
+      <div class="slbl"><span class="snum">3</span> Horário Disponível</div>
+      <div class="slgrid" id="slots-grid"><p style="color:#8A9BB8;font-size:13px">Selecione uma data primeiro</p></div>
+    </div>
+
+    <!-- Passo 4: Dados -->
+    <div class="bstep">
+      <div class="slbl"><span class="snum">4</span> Seus Dados</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="igrp"><label>Seu Nome *</label><input type="text" id="client-name" class="inp" placeholder="Nome completo" autocomplete="name"></div>
+        <div class="igrp"><label>WhatsApp *</label><input type="tel" id="client-phone" class="inp" placeholder="(11) 9xxxx-xxxx" autocomplete="tel"></div>
+      </div>
+    </div>
+
+    <!-- Passo 5: Confirmação -->
+    <div class="bstep">
+      <div class="slbl"><span class="snum">5</span> Confirmação</div>
+      <div class="ccard">
+        <div class="crow"><span class="cl">Serviço(s)</span><span class="cv" id="sum-service">—</span></div>
+        <div class="crow"><span class="cl">Duração Total</span><span class="cv" id="sum-duration">—</span></div>
+        <div class="crow"><span class="cl">Especialista</span><span class="cv" id="sum-specialist">—</span></div>
+        <div class="crow"><span class="cl">Data</span><span class="cv" id="sum-date">—</span></div>
+        <div class="crow"><span class="cl">Horário</span><span class="cv" id="sum-time">—</span></div>
+        <div class="crow"><span class="cl">Total</span><span class="cv" style="color:#F0C040;font-size:17px;font-weight:900" id="sum-price">—</span></div>
+      </div>
+      <button class="btn btn-gold btn-blk btn-lg" id="btn-confirm-booking">🎯 Confirmar Agendamento</button>
+      <p style="color:#8A9BB8;font-size:11px;text-align:center;margin-top:8px">Confirmação via WhatsApp</p>
+    </div>
+
+    <div style="height:16px"></div>
+  </div>
+
+  <!-- ========== GALERIA ========== -->
+  <div class="pg" id="pg-galeria">
+    <div class="ph"><h2>Galeria <span>da Semana</span></h2><p>Trabalhos recentes da nossa equipe</p></div>
+    <div class="ggrid" id="gallery-grid">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:#8A9BB8"><span class="sp"></span></div>
+    </div>
+  </div>
+
+  <!-- ========== CONTATO ========== -->
+  <div class="pg" id="pg-contato">
+    <div class="ph"><h2>Fale <span>Conosco</span></h2><p>Entre em contato com nossos especialistas</p></div>
+    <div class="ctpage">
+
+      <!-- Especialistas carregados dinamicamente -->
+      <div id="contact-specialists">
+        <div style="text-align:center;padding:30px;color:#8A9BB8"><span class="sp"></span></div>
+      </div>
+
+      <!-- Endereço fixo -->
+      <div class="endcard">
+        <div class="ei">📍</div>
+        <p>Av. Alfredo Barbosa, 1853<br>Jardim Palmira — Guarulhos SP</p>
+        <a class="btn btn-out btn-blk" data-maps href="#">🗺️ Abrir no Google Maps</a>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- BOTTOM NAV -->
+<nav class="bnav">
+  <button class="nb on" onclick="nav('inicio')"><span class="ic">🏠</span>Início</button>
+  <button class="nb" onclick="nav('servicos')"><span class="ic">🚗</span>Serviços</button>
+  <button class="nb" onclick="nav('agendar')"><span class="ic">📅</span>Agendar</button>
+  <button class="nb" onclick="nav('galeria')"><span class="ic">📸</span>Galeria</button>
+  <button class="nb" onclick="nav('contato')"><span class="ic">💬</span>Contato</button>
+</nav>
+
+<!-- Lightbox -->
+<div id="lb" style="display:none">
+  <button class="lbx" onclick="document.getElementById('lb').style.display='none'">✕</button>
+  <img src="" alt="">
+</div>
+
+<!-- Modal Sucesso -->
+<div id="modal-ok" class="mbk" style="display:none">
+  <div class="mbox">
+    <div style="font-size:52px;margin-bottom:14px">🎉</div>
+    <h2 style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:900;text-transform:uppercase;margin-bottom:8px">Agendado!</h2>
+    <p style="color:#8A9BB8;font-size:14px;margin-bottom:20px">Horário reservado com sucesso!<br>Aguarde a confirmação via WhatsApp.</p>
+    <button class="btn btn-gold btn-blk" onclick="document.getElementById('modal-ok').style.display='none';nav('inicio')">Ótimo! 👍</button>
+  </div>
+</div>
+
+<div id="tc"></div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/cloudinary.js"></script>
+<script src="js/client.js"></script>
+<script>
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+</script>
+</body>
+</html>
