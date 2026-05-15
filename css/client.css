@@ -12,12 +12,33 @@ html, body {
 }
 
 /* ===== PÁGINAS ===== */
-.app { position: fixed; inset: 0; bottom: 60px; overflow: hidden; }
+.app {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: calc(60px + env(safe-area-inset-bottom));
+  overflow: hidden;
+}
 .pg  { display: none; position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; background: #080808; }
 .pg.on { display: block; }
 
 /* ===== BOTTOM NAV ===== */
-.bnav { position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: rgba(8,8,8,0.98); border-top: 1px solid #1E1E1E; display: flex; z-index: 999; padding-bottom: env(safe-area-inset-bottom); }
+.bnav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: calc(60px + env(safe-area-inset-bottom));
+  background: rgba(8,8,8,0.98);
+  border-top: 1px solid #1E1E1E;
+  display: flex;
+  align-items: flex-start;
+  z-index: 999;
+  padding-bottom: env(safe-area-inset-bottom);
+}
 .nb  { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: none; cursor: pointer; color: #444; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; font-family: 'Nunito', sans-serif; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: color 0.2s; }
 .nb .ic { font-size: 20px; transition: transform 0.2s; }
 .nb.on { color: #D4AF37; }
@@ -250,4 +271,13 @@ html, body {
   gap: 7px;
   justify-content: center;
   width: 100%;
+}
+
+/* ===== SAFE AREA — CORREÇÃO PWA IPHONE ===== */
+/* Garante que o conteúdo não fique atrás da status bar nem do home indicator */
+.pg {
+  padding-bottom: 8px;
+}
+.hero {
+  padding-top: max(30px, 16px);
 }
