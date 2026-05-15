@@ -1,12 +1,10 @@
 // ============================================================
 // SERVICE WORKER — J&E Estética Automotiva
-// GitHub Pages: /EsteticaAutomotiva/
 // ============================================================
-const CACHE_NAME  = 'je-estetica-v4';
-const BASE        = '/EsteticaAutomotiva';
+const CACHE_NAME = 'je-estetica-v5';
+const BASE       = '/EsteticaAutomotiva';
 
 const ASSETS = [
-  `${BASE}/`,
   `${BASE}/index.html`,
   `${BASE}/login.html`,
   `${BASE}/admin.html`,
@@ -30,6 +28,11 @@ self.addEventListener('install', e => {
     caches.open(CACHE_NAME)
       .then(c => c.addAll(ASSETS))
       .then(() => self.skipWaiting())
+      .catch(err => {
+        console.error('[SW] Cache install error:', err);
+        // Mesmo com erro parcial, tenta ativar
+        return self.skipWaiting();
+      })
   );
 });
 
@@ -46,23 +49,24 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = e.request.url;
 
-  // Nunca cacheia serviços externos dinâmicos
   if (url.includes('firestore.googleapis.com') ||
       url.includes('identitytoolkit') ||
       url.includes('cloudinary.com') ||
-      url.includes('googleapis.com/css') ||
+      url.includes('googleapis.com') ||
       url.includes('gstatic.com')) {
     return;
   }
 
   e.respondWith(
     caches.match(e.request).then(cached => {
-      const network = fetch(e.request).then(response => {
-        if (response && response.status === 200 && response.type === 'basic') {
-          caches.open(CACHE_NAME).then(c => c.put(e.request, response.clone()));
-        }
-        return response;
-      }).catch(() => cached || caches.match(`${BASE}/index.html`));
+      const network = fetch(e.request)
+        .then(response => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            caches.open(CACHE_NAME).then(c => c.put(e.request, response.clone()));
+          }
+          return response;
+        })
+        .catch(() => cached || caches.match(`${BASE}/index.html`));
 
       return cached || network;
     })
