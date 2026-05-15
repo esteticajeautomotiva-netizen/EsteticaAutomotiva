@@ -1,29 +1,30 @@
 // ============================================================
 // SERVICE WORKER — J&E Estética Automotiva
+// GitHub Pages: /EsteticaAutomotiva/
 // ============================================================
-const CACHE_NAME = 'je-estetica-v3';
+const CACHE_NAME  = 'je-estetica-v4';
+const BASE        = '/EsteticaAutomotiva';
 
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/login.html',
-  '/admin.html',
-  '/specialist.html',
-  '/manifest.json',
-  '/css/vars.css',
-  '/css/client.css',
-  '/css/admin.css',
-  '/js/firebase-config.js',
-  '/js/cloudinary.js',
-  '/js/auth.js',
-  '/js/client.js',
-  '/js/admin.js',
-  '/js/specialist.js',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  `${BASE}/`,
+  `${BASE}/index.html`,
+  `${BASE}/login.html`,
+  `${BASE}/admin.html`,
+  `${BASE}/specialist.html`,
+  `${BASE}/manifest.json`,
+  `${BASE}/css/vars.css`,
+  `${BASE}/css/client.css`,
+  `${BASE}/css/admin.css`,
+  `${BASE}/js/firebase-config.js`,
+  `${BASE}/js/cloudinary.js`,
+  `${BASE}/js/auth.js`,
+  `${BASE}/js/client.js`,
+  `${BASE}/js/admin.js`,
+  `${BASE}/js/specialist.js`,
+  `${BASE}/icons/icon-192.png`,
+  `${BASE}/icons/icon-512.png`
 ];
 
-// Instala e pré-cacheia os assets
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE_NAME)
@@ -32,7 +33,6 @@ self.addEventListener('install', e => {
   );
 });
 
-// Remove caches antigos
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
@@ -43,11 +43,10 @@ self.addEventListener('activate', e => {
   );
 });
 
-// Estratégia: Network first → Cache fallback
 self.addEventListener('fetch', e => {
   const url = e.request.url;
 
-  // Nunca cacheia Firebase, Cloudinary ou googleapis (dinâmicos)
+  // Nunca cacheia serviços externos dinâmicos
   if (url.includes('firestore.googleapis.com') ||
       url.includes('identitytoolkit') ||
       url.includes('cloudinary.com') ||
@@ -60,13 +59,11 @@ self.addEventListener('fetch', e => {
     caches.match(e.request).then(cached => {
       const network = fetch(e.request).then(response => {
         if (response && response.status === 200 && response.type === 'basic') {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+          caches.open(CACHE_NAME).then(c => c.put(e.request, response.clone()));
         }
         return response;
-      }).catch(() => cached || caches.match('/index.html'));
+      }).catch(() => cached || caches.match(`${BASE}/index.html`));
 
-      // Retorna cache imediatamente se existir; atualiza em background
       return cached || network;
     })
   );
