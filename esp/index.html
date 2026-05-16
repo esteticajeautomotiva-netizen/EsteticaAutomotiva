@@ -3,198 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>J&E Estética Automotiva — Especialista</title>
+<title>J&amp;E Estética — Especialista</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#1A6BCC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <link rel="apple-touch-icon" href="/EsteticaAutomotiva/icons/icon-192-esp.png">
-<link rel="stylesheet" href="/EsteticaAutomotiva/css/vars.css">
-<link rel="stylesheet" href="/EsteticaAutomotiva/css/admin.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    height: 100%;
+    background: #080808;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nunito', sans-serif;
+    color: #E8EBF2;
+  }
+  .loading {
+    text-align: center;
+  }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(26, 107, 204, 0.2);
+    border-top-color: #1A6BCC;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto 16px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  p { color: #8A9BB8; font-size: 13px; }
+</style>
 </head>
 <body>
-<div id="toast-container"></div>
-<button class="menu-toggle" id="menu-toggle">☰</button>
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-<!-- ============================================================ -->
-<!--  SIDEBAR                                                     -->
-<!-- ============================================================ -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-logo">
-    <div class="logo-icon" style="border-radius:50%;overflow:hidden;padding:0;background:none"><img src="https://res.cloudinary.com/dmqtygmro/image/upload/v1778716782/WhatsApp_Image_2026-05-07_at_22.51.51_fac8lq.jpg" alt="J&E" style="width:100%;height:100%;object-fit:cover;display:block;border-radius:50%"></div>
-    <div class="logo-text">J&amp;E Estética<small>Especialista</small></div>
-  </div>
-
-  <nav class="sidebar-nav">
-    <a class="sidebar-item active" data-page="perfil">
-      <span class="icon">👤</span> Meu Perfil
-    </a>
-    <a class="sidebar-item" data-page="agendamentos">
-      <span class="icon">📅</span> Meus Agendamentos
-    </a>
-  </nav>
-
-  <div class="sidebar-footer">
-    <div class="sidebar-user">
-      <img class="avatar avatar-sm" id="nav-spec-foto"
-           src="https://ui-avatars.com/api/?name=E&background=1A1F2E&color=00D4FF&bold=true" alt="">
-      <div class="info">
-        <div class="name" id="nav-spec-nome">Especialista</div>
-        <div class="role" style="color:var(--gold)">Especialista</div>
-      </div>
-    </div>
-    <button class="sidebar-item" id="btn-logout-spec" style="color:var(--danger);margin-top:8px">
-      <span class="icon">🚪</span> Sair
-    </button>
-  </div>
-</aside>
-
-<!-- ============================================================ -->
-<!--  MAIN CONTENT                                                -->
-<!-- ============================================================ -->
-<main class="main-content">
-
-  <!-- ---- PERFIL ---- -->
-  <div id="page-perfil" class="page active">
-    <div class="page-header">
-      <div>
-        <div class="page-title">Meu Perfil</div>
-        <div class="page-subtitle">Gerencie suas informações</div>
-      </div>
-    </div>
-
-    <div class="specialist-profile-hero">
-      <!-- Foto -->
-      <div style="position:relative;flex-shrink:0">
-        <img id="prof-foto" class="avatar avatar-xl" alt="Foto de perfil"
-             src="https://ui-avatars.com/api/?name=E&background=1A1F2E&color=00D4FF&bold=true&size=128">
-        <label id="btn-change-foto" style="position:absolute;bottom:0;right:0;
-              background:var(--cyan);color:#000;border:2px solid var(--bg);
-              width:34px;height:34px;border-radius:50%;
-              display:flex;align-items:center;justify-content:center;
-              font-size:16px;cursor:pointer;font-weight:700"
-              title="Alterar foto">
-          📷
-          <input type="file" id="foto-input" accept="image/*" capture="user" style="display:none">
-        </label>
-      </div>
-
-      <div class="profile-info">
-        <div class="name" id="prof-nome">Carregando...</div>
-        <div class="specialty" id="prof-esp">—</div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap">
-          <span style="font-size:13px;color:var(--text-2)">📱 <span id="prof-fone">—</span></span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Stats rápidas -->
-    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr)">
-      <div class="stat-card cyan">
-        <div class="stat-icon">📅</div>
-        <div class="stat-value" id="spec-hoje">—</div>
-        <div class="stat-label">Hoje</div>
-      </div>
-      <div class="stat-card gold">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-value" id="spec-pendentes">—</div>
-        <div class="stat-label">Pendentes</div>
-      </div>
-      <div class="stat-card green">
-        <div class="stat-icon">📋</div>
-        <div class="stat-value" id="spec-total">—</div>
-        <div class="stat-label">Total</div>
-      </div>
-    </div>
-
-    <!-- ===== MEUS GANHOS ===== -->
-    <div class="card" style="margin-top:16px">
-
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px">
-        <h3 style="font-family:var(--font-display);font-size:18px;font-weight:800;text-transform:uppercase">
-          💰 Meus Ganhos
-        </h3>
-        <div style="display:flex;gap:6px;flex-wrap:wrap" id="ganhos-period-btns">
-          <button class="filter-btn active" data-gperiod="semana"  onclick="changeGanhosPeriod(this,'semana')">Semana</button>
-          <button class="filter-btn"        data-gperiod="mes"     onclick="changeGanhosPeriod(this,'mes')">Mês</button>
-          <button class="filter-btn"        data-gperiod="ano"     onclick="changeGanhosPeriod(this,'ano')">Ano</button>
-          <button class="filter-btn"        data-gperiod="total"   onclick="changeGanhosPeriod(this,'total')">Total</button>
-        </div>
-      </div>
-
-      <!-- Destaque principal -->
-      <div class="ganhos-hero">
-        <div class="ganhos-hero-label" id="ganhos-label">Esta Semana</div>
-        <div class="ganhos-hero-valor" id="ganhos-valor">—</div>
-        <div class="ganhos-hero-sub"   id="ganhos-sub">— serviços concluídos</div>
-      </div>
-
-      <!-- Grade de detalhe: semana → dias | mês → semanas | ano → meses -->
-      <div class="ganhos-detalhe" id="ganhos-detalhe">
-        <div style="text-align:center;padding:20px;color:var(--text-2)"><span class="spinner"></span></div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:8px">
-      <h3 style="font-family:var(--font-display);font-size:16px;font-weight:800;text-transform:uppercase;margin-bottom:12px">
-        💡 Como alterar minha foto?
-      </h3>
-      <p style="color:var(--text-2);font-size:13px;line-height:1.7">
-        Clique no ícone 📷 sobre sua foto de perfil.<br>
-        Você pode tirar uma foto agora ou escolher uma da sua galeria.<br>
-        A foto será exibida para os clientes ao agendar.
-      </p>
-    </div>
-  </div>
-
-  <!-- ---- AGENDAMENTOS ---- -->
-  <div id="page-agendamentos" class="page">
-    <div class="page-header">
-      <div>
-        <div class="page-title">Meus Agendamentos</div>
-        <div class="page-subtitle">Seus próximos atendimentos</div>
-      </div>
-    </div>
-
-    <div class="appointments-filters">
-      <button class="filter-btn active" data-filter="todos">Todos</button>
-      <button class="filter-btn" data-filter="pendente">Pendentes</button>
-      <button class="filter-btn" data-filter="confirmado">Confirmados</button>
-      <button class="filter-btn" data-filter="concluido">Concluídos</button>
-    </div>
-
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Data / Hora</th>
-            <th>Cliente</th>
-            <th>Telefone</th>
-            <th>Serviço</th>
-            <th>Status</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="my-appointments-tbody">
-          <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-2)">Carregando...</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-</main>
-
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-
-<script src="/EsteticaAutomotiva/js/firebase-config.js"></script>
-<script src="/EsteticaAutomotiva/js/cloudinary.js"></script>
-<script src="/EsteticaAutomotiva/js/auth.js"></script>
-<script src="/EsteticaAutomotiva/js/specialist.js"></script>
+<div class="loading">
+  <div class="spinner"></div>
+  <p>Carregando área do especialista...</p>
+</div>
 
 <script>
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/EsteticaAutomotiva/esp/sw.js', { scope: '/EsteticaAutomotiva/esp/' });
+// Registra o SW dedicado ao ESP e redireciona para specialist.html
+(async function() {
+  if ('serviceWorker' in navigator) {
+    try {
+      const reg = await navigator.serviceWorker.register(
+        '/EsteticaAutomotiva/esp/sw.js',
+        { scope: '/EsteticaAutomotiva/esp/' }
+      );
+
+      if (navigator.serviceWorker.controller) {
+        window.location.replace('/EsteticaAutomotiva/specialist.html');
+        return;
+      }
+
+      await new Promise(resolve => {
+        if (reg.active) { resolve(); return; }
+        const sw = reg.installing || reg.waiting;
+        if (sw) {
+          sw.addEventListener('statechange', function() {
+            if (this.state === 'activated') resolve();
+          });
+        } else {
+          navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true });
+        }
+      });
+
+      window.location.replace('/EsteticaAutomotiva/specialist.html');
+    } catch (err) {
+      console.error('[ESP] Erro no SW:', err);
+      window.location.replace('/EsteticaAutomotiva/specialist.html');
+    }
+  } else {
+    window.location.replace('/EsteticaAutomotiva/specialist.html');
+  }
+})();
 </script>
 </body>
 </html>
