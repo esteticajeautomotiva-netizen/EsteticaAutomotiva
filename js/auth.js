@@ -17,7 +17,7 @@ async function loginUser(email, password) {
 // Logout
 async function logoutUser() {
   await auth.signOut();
-  window.location.href = "login.html";
+  window.location.href = "/EsteticaAutomotiva/login.html";
 }
 
 // Verificar sessão ativa e redirecionar conforme papel
@@ -25,22 +25,22 @@ function checkSession(requiredRole) {
   return new Promise((resolve, reject) => {
     auth.onAuthStateChanged(async (user) => {
       if (!user) {
-        window.location.href = "login.html";
+        window.location.href = "/EsteticaAutomotiva/login.html";
         return reject("Não autenticado");
       }
       const userDoc = await db.collection("users").doc(user.uid).get();
       if (!userDoc.exists) {
         await auth.signOut();
-        window.location.href = "login.html";
+        window.location.href = "/EsteticaAutomotiva/login.html";
         return reject("Sem perfil");
       }
       const userData = { uid: user.uid, email: user.email, ...userDoc.data() };
 
       if (requiredRole && userData.role !== requiredRole) {
         // Redireciona para página correta conforme papel
-        if (userData.role === "admin") window.location.href = "admin.html";
-        else if (userData.role === "specialist") window.location.href = "specialist.html";
-        else window.location.href = "index.html";
+        if (userData.role === "admin") window.location.href = "/EsteticaAutomotiva/admin.html";
+        else if (userData.role === "specialist") window.location.href = "/EsteticaAutomotiva/specialist.html";
+        else window.location.href = "/EsteticaAutomotiva/index.html";
         return reject("Papel incorreto");
       }
       resolve(userData);
