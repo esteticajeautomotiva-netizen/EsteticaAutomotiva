@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>J&E Estética Automotiva — Painel ADM</title>
-<link rel="manifest" href="manifest-admin.json">
-<meta name="theme-color" content="#D4AF37">
+<link rel="manifest" href="adm/manifest.json">
+<meta name="theme-color" content="#CC0000">
 <link rel="apple-touch-icon" href="icons/icon-192-adm.png">
 <link rel="stylesheet" href="css/vars.css">
 <link rel="stylesheet" href="css/admin.css">
@@ -481,8 +481,12 @@ document.getElementById('spec-foto-input')?.addEventListener('change', function(
   }
 });
 
-// PWA
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+// PWA — registra o SW da pasta /adm/ com escopo correto
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/EsteticaAutomotiva/adm/sw.js', {
+    scope: '/EsteticaAutomotiva/adm/'
+  }).catch(err => console.warn('[SW-ADM] Registro falhou:', err));
+}
 </script>
 </body>
 </html>
