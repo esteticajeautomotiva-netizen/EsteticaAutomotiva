@@ -1,0 +1,19 @@
+{
+  "id": "je-estetica-esp",
+  "name": "J&E Estética — Especialista",
+  "short_name": "J&E ESP",
+  "description": "Área do especialista J&E Estética Automotiva",
+  "start_url": "/EsteticaAutomotiva/esp/",
+  "scope": "/EsteticaAutomotiva/esp/",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#1A6BCC",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/EsteticaAutomotiva/icons/icon-192-esp.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/EsteticaAutomotiva/icons/icon-192-esp.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/EsteticaAutomotiva/icons/icon-512-esp.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/EsteticaAutomotiva/icons/icon-512-esp.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
