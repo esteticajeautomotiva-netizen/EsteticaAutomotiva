@@ -355,10 +355,18 @@ async function loadSlots() {
       return;
     }
 
+    // Verifica horários passados para o dia de hoje
+    const nowDate = new Date();
+    const todayStr = nowDate.toISOString().split('T')[0];
+    const isToday = state.selectedDate === todayStr;
+    const nowMin = isToday ? nowDate.getHours() * 60 + nowDate.getMinutes() : -1;
+
     grid.innerHTML = slots.map(t => {
       const occ = ocupados.has(t);
-      return `<button class="slbtn ${occ ? 'occ' : ''} ${t === state.selectedTime ? 'sel' : ''}"
-        ${occ ? 'disabled' : `onclick="selectTime('${t}')"`}>${t}</button>`;
+      const past = isToday && timeToMin(t) <= nowMin;
+      const off = occ || past;
+      return `<button class="slbtn ${occ ? 'occ' : ''} ${past ? 'past' : ''} ${t === state.selectedTime ? 'sel' : ''}"
+        ${off ? 'disabled' : `onclick="selectTime('${t}')"`}>${t}</button>`;
     }).join('');
   } catch(e) {
     grid.innerHTML = '<p style="color:#FF4D4F">Erro ao carregar horários</p>';
