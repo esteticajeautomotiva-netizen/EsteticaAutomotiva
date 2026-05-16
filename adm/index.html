@@ -33,51 +33,29 @@
 </style>
 </head>
 <body>
-  <img src="/EsteticaAutomotiva/icons/icon-192-adm.png" alt="J&E ADM">
-  <p>Carregando painel administrativo...</p>
+  <img id="splash-img" src="/EsteticaAutomotiva/icons/icon-192-adm.png" alt="J&E ADM">
+  <p id="splash-txt">Carregando painel administrativo...</p>
+
+  <!-- iframe invisível que ocupa tela toda após carregar -->
+  <iframe
+    id="app-frame"
+    src="/EsteticaAutomotiva/admin.html"
+    style="display:none;position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999"
+    onload="showFrame()"
+  ></iframe>
 
   <script>
-    // Registra o SW local (escopo /adm/) antes de qualquer coisa
+    // Registra o SW do escopo /adm/
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js', { scope: '/EsteticaAutomotiva/adm/' })
-        .then(reg => {
-          // Aguarda o SW estar ativo e então navega para o admin real
-          // O SW intercepta essa URL e serve admin.html sem redirecionar
-          if (reg.active) {
-            loadAdmin();
-          } else {
-            const worker = reg.installing || reg.waiting;
-            worker.addEventListener('statechange', () => {
-              if (worker.state === 'activated') loadAdmin();
-            });
-          }
-        })
-        .catch(err => {
-          // Se SW falhar, cai no redirect tradicional como fallback
-          console.warn('SW não disponível, usando redirect:', err);
-          window.location.replace('/EsteticaAutomotiva/admin.html');
-        });
-    } else {
-      // Browser sem suporte a SW — redirect direto
-      window.location.replace('/EsteticaAutomotiva/admin.html');
+        .catch(err => console.warn('[SW-ADM]', err));
     }
 
-    function loadAdmin() {
-      // Usa fetch + document.write para carregar admin.html NO MESMO contexto
-      // mantendo a URL /adm/ — o PWA não "sai" do escopo
-      fetch('/EsteticaAutomotiva/admin.html')
-        .then(r => r.text())
-        .then(html => {
-          // Substitui o documento inteiro sem mudar a URL
-          document.open();
-          document.write(html);
-          document.close();
-          // Corrige caminhos relativos dos scripts/css que admin.html usa
-          // (eles já usam caminhos absolutos /EsteticaAutomotiva/... então funciona)
-        })
-        .catch(() => {
-          window.location.replace('/EsteticaAutomotiva/admin.html');
-        });
+    function showFrame() {
+      // Esconde splash e exibe o iframe com o admin real
+      document.getElementById('splash-img').style.display = 'none';
+      document.getElementById('splash-txt').style.display = 'none';
+      document.getElementById('app-frame').style.display  = 'block';
     }
   </script>
 </body>
