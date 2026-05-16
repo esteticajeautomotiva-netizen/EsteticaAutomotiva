@@ -482,7 +482,7 @@ document.getElementById('spec-foto-input')?.addEventListener('change', function(
 });
 
 // PWA
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('/EsteticaAutomotiva/sw.js');
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/EsteticaAutomotiva/adm/sw.js', { scope: '/EsteticaAutomotiva/adm/' });
 </script>
 </body>
 </html>
