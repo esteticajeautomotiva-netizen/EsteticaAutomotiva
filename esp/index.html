@@ -33,41 +33,27 @@
 </style>
 </head>
 <body>
-  <img src="/EsteticaAutomotiva/icons/icon-192-esp.png" alt="J&E Especialista">
-  <p>Carregando área do especialista...</p>
+  <img id="splash-img" src="/EsteticaAutomotiva/icons/icon-192-esp.png" alt="J&E Especialista">
+  <p id="splash-txt">Carregando área do especialista...</p>
+
+  <!-- iframe invisível que ocupa tela toda após carregar -->
+  <iframe
+    id="app-frame"
+    src="/EsteticaAutomotiva/specialist.html"
+    style="display:none;position:fixed;inset:0;width:100%;height:100%;border:none;z-index:9999"
+    onload="showFrame()"
+  ></iframe>
 
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js', { scope: '/EsteticaAutomotiva/esp/' })
-        .then(reg => {
-          if (reg.active) {
-            loadSpecialist();
-          } else {
-            const worker = reg.installing || reg.waiting;
-            worker.addEventListener('statechange', () => {
-              if (worker.state === 'activated') loadSpecialist();
-            });
-          }
-        })
-        .catch(err => {
-          console.warn('SW não disponível, usando redirect:', err);
-          window.location.replace('/EsteticaAutomotiva/specialist.html');
-        });
-    } else {
-      window.location.replace('/EsteticaAutomotiva/specialist.html');
+        .catch(err => console.warn('[SW-ESP]', err));
     }
 
-    function loadSpecialist() {
-      fetch('/EsteticaAutomotiva/specialist.html')
-        .then(r => r.text())
-        .then(html => {
-          document.open();
-          document.write(html);
-          document.close();
-        })
-        .catch(() => {
-          window.location.replace('/EsteticaAutomotiva/specialist.html');
-        });
+    function showFrame() {
+      document.getElementById('splash-img').style.display = 'none';
+      document.getElementById('splash-txt').style.display = 'none';
+      document.getElementById('app-frame').style.display  = 'block';
     }
   </script>
 </body>
