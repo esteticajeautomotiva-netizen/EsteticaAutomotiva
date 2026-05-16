@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>J&E Especialista</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1A6BCC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="J&E ESP">
+<link rel="apple-touch-icon" href="/EsteticaAutomotiva/icons/icon-192-esp.png">
+<style>
+  body { margin:0; background:#080808; display:flex; align-items:center; justify-content:center; min-height:100vh; flex-direction:column; gap:16px; }
+  img  { width:100px; height:100px; border-radius:50%; border:2px solid #1A6BCC; box-shadow:0 0 30px rgba(26,107,204,0.5); animation:pulse 1.5s ease-in-out infinite; }
+  p    { color:#888; font-family:sans-serif; font-size:13px; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+</style>
+</head>
+<body>
+  <img src="/EsteticaAutomotiva/icons/icon-192-esp.png" alt="J&E Especialista">
+  <p>Carregando área do especialista...</p>
+  <script>
+    window.location.replace('/EsteticaAutomotiva/specialist.html');
+  </script>
+</body>
+</html>

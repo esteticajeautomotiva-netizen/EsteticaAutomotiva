@@ -1,0 +1,19 @@
+{
+  "id": "je-estetica-adm",
+  "name": "J&E Estética — ADM",
+  "short_name": "J&E ADM",
+  "description": "Painel administrativo J&E Estética Automotiva",
+  "start_url": "/EsteticaAutomotiva/adm/",
+  "scope": "/EsteticaAutomotiva/adm/",
+  "display": "standalone",
+  "background_color": "#080808",
+  "theme_color": "#CC0000",
+  "orientation": "portrait-primary",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "/EsteticaAutomotiva/icons/icon-192-adm.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/EsteticaAutomotiva/icons/icon-192-adm.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "/EsteticaAutomotiva/icons/icon-512-adm.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/EsteticaAutomotiva/icons/icon-512-adm.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
