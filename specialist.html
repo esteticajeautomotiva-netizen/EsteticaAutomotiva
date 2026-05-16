@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>J&E Estética Automotiva — Especialista</title>
-<link rel="manifest" href="manifest-specialist.json">
-<meta name="theme-color" content="#D4AF37">
+<link rel="manifest" href="esp/manifest.json">
+<meta name="theme-color" content="#1A6BCC">
 <link rel="apple-touch-icon" href="icons/icon-192-esp.png">
 <link rel="stylesheet" href="css/vars.css">
 <link rel="stylesheet" href="css/admin.css">
@@ -194,7 +194,12 @@
 <script src="js/specialist.js"></script>
 
 <script>
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+// PWA — registra o SW da pasta /esp/ com escopo correto
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/EsteticaAutomotiva/esp/sw.js', {
+    scope: '/EsteticaAutomotiva/esp/'
+  }).catch(err => console.warn('[SW-ESP] Registro falhou:', err));
+}
 </script>
 </body>
 </html>
