@@ -85,9 +85,9 @@ auth.onAuthStateChanged(async user => {
   const doc = await db.collection('users').doc(user.uid).get();
   if (!doc.exists) { await auth.signOut(); return; }
   const role = doc.data().role;
-  if (role === 'admin') window.location.href = 'admin.html';
-  else if (role === 'specialist') window.location.href = 'specialist.html';
-  else window.location.href = 'index.html';
+  if (role === 'admin') window.location.href = '/EsteticaAutomotiva/admin.html';
+  else if (role === 'specialist') window.location.href = '/EsteticaAutomotiva/specialist.html';
+  else window.location.href = '/EsteticaAutomotiva/index.html';
 });
 
 async function doLogin() {
@@ -103,9 +103,9 @@ async function doLogin() {
     const doc = await db.collection('users').doc(r.user.uid).get();
     if (!doc.exists) throw new Error('Usuário sem perfil no sistema');
     const role = doc.data().role;
-    if (role === 'admin') window.location.href = 'admin.html';
-    else if (role === 'specialist') window.location.href = 'specialist.html';
-    else window.location.href = 'index.html';
+    if (role === 'admin') window.location.href = '/EsteticaAutomotiva/admin.html';
+    else if (role === 'specialist') window.location.href = '/EsteticaAutomotiva/specialist.html';
+    else window.location.href = '/EsteticaAutomotiva/index.html';
   } catch (e) {
     const msgs = { 'auth/user-not-found':'E-mail não encontrado', 'auth/wrong-password':'Senha incorreta',
                    'auth/invalid-email':'E-mail inválido', 'auth/too-many-requests':'Muitas tentativas. Aguarde.' };
