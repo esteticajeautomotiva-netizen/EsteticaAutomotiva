@@ -2,7 +2,6 @@
 // AUTH.JS — Autenticação e controle de sessão
 // ============================================================
 
-// Login com email/senha
 async function loginUser(email, password) {
   try {
     const result = await auth.signInWithEmailAndPassword(email, password);
@@ -14,13 +13,11 @@ async function loginUser(email, password) {
   }
 }
 
-// Logout
 async function logoutUser() {
   await auth.signOut();
   window.location.href = "login.html";
 }
 
-// Verificar sessão ativa e redirecionar conforme papel
 function checkSession(requiredRole) {
   return new Promise((resolve, reject) => {
     auth.onAuthStateChanged(async (user) => {
@@ -35,9 +32,8 @@ function checkSession(requiredRole) {
         return reject("Sem perfil");
       }
       const userData = { uid: user.uid, email: user.email, ...userDoc.data() };
-
       if (requiredRole && userData.role !== requiredRole) {
-        // Papel incorreto para este app — vai para login
+        // Papel incorreto — desloga e vai para login deste app
         await auth.signOut();
         window.location.href = "login.html";
         return reject("Papel incorreto");
@@ -47,7 +43,6 @@ function checkSession(requiredRole) {
   });
 }
 
-// Criar usuário especialista pelo admin (sem mudar sessão do admin)
 async function createSpecialistUser(email, password, specialistData) {
   const secondaryApp = firebase.initializeApp(firebaseConfig, "secondary");
   try {
@@ -65,12 +60,10 @@ async function createSpecialistUser(email, password, specialistData) {
   }
 }
 
-// Recuperar senha
 async function resetPassword(email) {
   await auth.sendPasswordResetEmail(email);
 }
 
-// Tradução de erros Firebase
 function translateFirebaseError(code) {
   const map = {
     "auth/user-not-found": "E-mail não encontrado",
