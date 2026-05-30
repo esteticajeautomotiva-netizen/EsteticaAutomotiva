@@ -1,10 +1,17 @@
 const CACHE_NAME = 'je-cliente-v3';
 const BASE = '/EsteticaAutomotiva';
 const ASSETS = [
-  `${BASE}/index.html`, `${BASE}/login.html`, `${BASE}/manifest.json`,
-  `${BASE}/vars.css`, `${BASE}/client.css`,
-  `${BASE}/firebase-config.js`, `${BASE}/cloudinary.js`, `${BASE}/auth.js`, `${BASE}/client.js`,
-  `${BASE}/icon-192.png`, `${BASE}/icon-512.png`
+  `${BASE}/index.html`,
+  `${BASE}/login.html`,
+  `${BASE}/manifest.json`,
+  `${BASE}/vars.css`,
+  `${BASE}/client.css`,
+  `${BASE}/firebase-config.js`,
+  `${BASE}/cloudinary.js`,
+  `${BASE}/auth.js`,
+  `${BASE}/client.js`,
+  `${BASE}/icon-192.png`,
+  `${BASE}/icon-512.png`
 ];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
