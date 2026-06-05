@@ -1,288 +1,557 @@
-/* ============================================================
-   CLIENT.CSS — J&E Estética Automotiva
-   ============================================================ */
+// ============================================================
+// CLIENT.JS — J&E Estética Automotiva
+// Suporte a múltiplos serviços por agendamento
+// ============================================================
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body {
-  height: 100%; height: 100dvh;
-  overflow: hidden;
-  background: #080808;
-  font-family: 'Nunito', sans-serif;
-  color: #E8EBF2;
+// ---- Estado global ----
+const state = {
+  selectedServices:   [],   // array de serviços selecionados
+  selectedSpecialist: null,
+  selectedDate:       null,
+  selectedTime:       null,
+  services:           [],
+  specialists:        [],
+  settings:           { inicio: '08:00', fim: '18:00', diasSemana: [1,2,3,4,5,6] }
+};
+
+// ---- Toast ----
+function toast(msg, type = 'info') {
+  const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+  const t = document.createElement('div');
+  t.className = 'tst ' + ({ success:'tst-ok', error:'tst-err', info:'tst-inf', warning:'tst-warn' }[type] || 'tst-inf');
+  t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  document.getElementById('tc').appendChild(t);
+  setTimeout(() => t.remove(), 3200);
 }
 
-/* ===== PÁGINAS ===== */
-.app {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: calc(60px + env(safe-area-inset-bottom));
-  overflow: hidden;
-}
-.pg  { display: none; position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; background: #080808; }
-.pg.on { display: block; }
+// ---- Navegação ----
+const PAGES = ['inicio','servicos','agendar','galeria','contato'];
 
-/* ===== BOTTOM NAV ===== */
-.bnav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: calc(60px + env(safe-area-inset-bottom));
-  background: rgba(8,8,8,0.98);
-  border-top: 1px solid #1E1E1E;
-  display: flex;
-  align-items: flex-start;
-  z-index: 999;
-  padding-bottom: env(safe-area-inset-bottom);
-}
-.nb  { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; background: none; border: none; cursor: pointer; color: #444; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; font-family: 'Nunito', sans-serif; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: color 0.2s; }
-.nb .ic { font-size: 20px; transition: transform 0.2s; }
-.nb.on { color: #D4AF37; }
-.nb.on .ic { transform: scale(1.2); filter: drop-shadow(0 0 4px #D4AF37); }
+function nav(name) {
+  PAGES.forEach(p => {
+    const el = document.getElementById('pg-' + p);
+    if (el) el.classList.toggle('on', p === name);
+  });
+  document.querySelectorAll('.nb').forEach((btn, i) => {
+    btn.classList.toggle('on', PAGES[i] === name);
+  });
+  const el = document.getElementById('pg-' + name);
+  if (el) el.scrollTop = 0;
 
-/* ===== INÍCIO ===== */
-.hero { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 20px 20px; background: radial-gradient(ellipse 90% 50% at 50% 0%, rgba(212,175,55,0.12), transparent); }
-.logo { width: 100px; height: 100px; border-radius: 50%; overflow: hidden; border: 2px solid rgba(212,175,55,0.5); box-shadow: 0 0 40px rgba(212,175,55,0.45); margin: 0 auto 16px; animation: float 4s ease-in-out infinite; background: #000; }
-.logo img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
-@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
-.tag  { background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.3); color: #D4AF37; font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; padding: 4px 14px; border-radius: 100px; display: inline-block; margin-bottom: 12px; }
-.hero h1 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(38px, 9vw, 70px); font-weight: 900; text-transform: uppercase; line-height: 0.95; margin-bottom: 12px; }
-.hero h1 span { color: #D4AF37; }
-.hero p { font-size: 14px; color: #8A9BB8; max-width: 300px; margin: 0 auto 24px; line-height: 1.5; }
-.hero-btns  { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 280px; }
-.hero-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 300px; margin-top: 20px; }
-.hcard      { background: #141414; border: 1px solid #222; border-radius: 12px; padding: 12px; text-align: center; }
-.hcard .i   { font-size: 20px; margin-bottom: 4px; }
-.hcard .l   { font-size: 10px; color: #8A9BB8; }
-.hcard .v   { font-size: 12px; font-weight: 700; margin-top: 2px; }
-
-/* ===== HEADER INTERNO ===== */
-.ph { padding: 14px 16px 10px; border-bottom: 1px solid #1E1E1E; background: #080808; position: sticky; top: 0; z-index: 10; }
-.ph h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-.ph h2 span { color: #D4AF37; }
-.ph p { font-size: 11px; color: #8A9BB8; margin-top: 1px; }
-
-/* ===== SERVIÇOS ===== */
-.sgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; padding: 12px; max-width: 600px; }
-
-.scard { background: #141414; border: 1.5px solid #222; border-radius: 16px; overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s, transform 0.15s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; position: relative; }
-.scard:active { transform: scale(0.96); }
-.scard.sel { border-color: #D4AF37; box-shadow: 0 0 0 2px rgba(212,175,55,0.2), 0 6px 24px rgba(212,175,55,0.1); }
-.scard.sel::after { content: '✓'; position: absolute; top: 8px; right: 8px; background: #D4AF37; color: #000; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 900; }
-
-.simg { width: 100%; height: 90px; background: linear-gradient(135deg, #1C1C1C, #242424); display: flex; align-items: center; justify-content: center; font-size: 30px; overflow: hidden; position: relative; }
-.simg img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.sdur-badge { position: absolute; bottom: 6px; right: 6px; background: rgba(0,0,0,0.75); color: #D4AF37; font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
-
-.sinf  { padding: 10px 12px 12px; }
-.snom  { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800; text-transform: uppercase; line-height: 1.1; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.sdesc { font-size: 10px; color: #666; margin-bottom: 8px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.smeta { display: flex; justify-content: space-between; align-items: center; }
-.spreco { font-family: 'Barlow Condensed', sans-serif; font-size: 19px; font-weight: 900; color: #F0C040; line-height: 1; }
-
-/* ===== TAGS DE SERVIÇO SELECIONADO ===== */
-.selected-svc-tag {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(212,175,55,0.08);
-  border: 1px solid rgba(212,175,55,0.3);
-  border-radius: 8px;
-  padding: 8px 10px;
-  font-size: 13px;
-}
-.selected-svc-tag .svc-nome { font-weight: 700; color: #D4AF37; flex: 1; }
-.selected-svc-tag .svc-meta { font-size: 11px; color: #8A9BB8; white-space: nowrap; }
-.selected-svc-tag .svc-rm  {
-  background: none; border: none; cursor: pointer;
-  color: #555; font-size: 14px; padding: 0 2px;
-  transition: color 0.15s; flex-shrink: 0;
-}
-.selected-svc-tag .svc-rm:hover { color: #FF4D4F; }
-
-.svc-totals {
-  display: flex; gap: 16px; flex-wrap: wrap;
-  padding: 8px 4px 0;
-  font-size: 12px; color: #8A9BB8;
-  border-top: 1px dashed #2A2A2A;
-  margin-top: 4px;
-}
-.svc-totals strong { color: #F0C040; }
-
-/* ===== ESPECIALISTAS ===== */
-.spec-sec { display: flex; align-items: center; gap: 8px; padding: 16px 14px 10px; border-top: 1px solid #1E1E1E; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #555; letter-spacing: 1.5px; }
-.spec-sec::after { content: ''; flex: 1; height: 1px; background: #1E1E1E; }
-
-.spec-row { display: flex; gap: 8px; padding: 0 14px 14px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.spec-row::-webkit-scrollbar { display: none; }
-
-.specc {
-  flex: 0 0 auto;
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  width: 120px;
-  background: #141414; border: 1.5px solid #222; border-radius: 14px;
-  padding: 14px 10px 12px;
-  cursor: pointer;
-  transition: border-color 0.2s, background 0.2s;
-  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
-  text-align: center;
-}
-.specc:active { transform: scale(0.97); }
-.specc.sel    { border-color: #D4AF37; background: rgba(212,175,55,0.06); }
-
-.specc img { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; border: 2px solid #2A2A2A; transition: border-color 0.2s; flex-shrink: 0; }
-.specc.sel img { border-color: #D4AF37; }
-.specc-info { width: 100%; }
-.spnome { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-.spesp  { font-size: 9px; color: #D4AF37; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-
-.cont-btn { padding: 4px 14px 16px; }
-
-/* ===== AGENDAR ===== */
-.bstep { padding: 14px 16px; border-bottom: 1px solid #1E1E1E; }
-.slbl  { display: flex; align-items: center; gap: 7px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; text-transform: uppercase; color: #8A9BB8; margin-bottom: 10px; }
-.snum  { width: 22px; height: 22px; background: rgba(212,175,55,0.12); border: 1px solid #D4AF37; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; color: #D4AF37; flex-shrink: 0; }
-
-.drow { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-.drow::-webkit-scrollbar { display: none; }
-.dbtn { flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; padding: 8px 10px; border-radius: 10px; border: 1.5px solid #2A2A2A; background: #1A1A1A; cursor: pointer; color: #E8EBF2; font-family: 'Nunito', sans-serif; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: all 0.15s; }
-.dbtn .dn { font-size: 9px; text-transform: uppercase; color: #8A9BB8; }
-.dbtn .dd { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 900; line-height: 1; }
-.dbtn .dm { font-size: 9px; color: #444; }
-.dbtn.sel { border-color: #D4AF37; background: rgba(212,175,55,0.1); color: #D4AF37; }
-
-.slgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(66px, 1fr)); gap: 7px; }
-.slbtn  { padding: 10px 4px; border-radius: 10px; border: 1.5px solid #2A2A2A; background: #1A1A1A; color: #E8EBF2; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; transition: all 0.15s; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
-.slbtn.sel { border-color: #D4AF37; background: rgba(212,175,55,0.1); color: #D4AF37; }
-.slbtn.occ { opacity: 0.3; cursor: not-allowed; text-decoration: line-through; }
-.slbtn.past {
-  opacity: 0.3;
-  cursor: not-allowed;
-  text-decoration: line-through;
+  if (name === 'galeria') loadGallery();
+  if (name === 'agendar') updateBookingSummary();
+  if (name === 'contato') loadContactSpecialists();
 }
 
-.igrp { display: flex; flex-direction: column; gap: 5px; }
-.igrp label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: #8A9BB8; }
-.inp  { background: #1A1A1A; border: 1.5px solid #2A2A2A; border-radius: 10px; color: #E8EBF2; font-family: 'Nunito', sans-serif; font-size: 14px; padding: 12px 14px; width: 100%; outline: none; }
-.inp:focus { border-color: #D4AF37; box-shadow: 0 0 0 3px rgba(212,175,55,0.1); }
+// ---- Init ----
+document.addEventListener('DOMContentLoaded', async () => {
+  setupWhatsApp();
+  setupMaps();
+  document.getElementById('btn-confirm-booking')?.addEventListener('click', confirmBooking);
+  await loadSettings();
+  generateDates();
+  await loadServices();
+  await loadSpecialists();
+});
 
-.ccard { background: #1A1A1A; border: 1px solid #2A2A2A; border-radius: 10px; padding: 12px; margin-bottom: 12px; }
-.crow  { display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid #2A2A2A; font-size: 13px; gap: 8px; }
-.crow:last-child { border-bottom: none; }
-.crow .cl { color: #8A9BB8; white-space: nowrap; flex-shrink: 0; }
-.crow .cv { font-weight: 700; text-align: right; word-break: break-word; }
+// ---- Configurações ----
 
-/* ===== GALERIA ===== */
-.ggrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 2px; }
-.gitem { aspect-ratio: 1; overflow: hidden; cursor: pointer; background: #1A1A1A; }
-.gitem img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.gitem:active img { opacity: 0.7; }
-
-/* ===== CONTATO ===== */
-.ctpage { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
-
-#contact-specialists { display: flex; flex-direction: column; gap: 10px; }
-
-.ctcard { background: #141414; border: 1px solid #222; border-radius: 14px; padding: 16px; display: flex; align-items: center; gap: 12px; }
-
-/* Avatar com foto real */
-.ctav-foto { flex-shrink: 0; }
-.ctav-img  { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(212,175,55,0.4); }
-
-/* Fallback emoji (legado) */
-.ctav { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg,#D4AF37,#7A5C10); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-
-.ctnome { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 900; text-transform: uppercase; }
-.ctesp  { font-size: 11px; color: #D4AF37; margin: 2px 0 4px; }
-.ctfone { font-size: 12px; color: #8A9BB8; margin-bottom: 10px; }
-
-.endcard    { background: #141414; border: 1px solid #222; border-radius: 14px; padding: 18px; text-align: center; }
-.endcard .ei { font-size: 28px; margin-bottom: 8px; }
-.endcard p  { color: #8A9BB8; font-size: 13px; line-height: 1.6; margin-bottom: 14px; }
-
-/* ===== BOTÕES ===== */
-.btn { display: inline-flex; align-items: center; gap: 7px; padding: 12px 20px; border: none; border-radius: 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.4px; cursor: pointer; text-decoration: none; white-space: nowrap; touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: all 0.2s; }
-.btn-gold  { background: #D4AF37; color: #000; }
-.btn-gold:active { opacity: 0.85; }
-.btn-out   { background: transparent; border: 1.5px solid #2A2A2A; color: #E8EBF2; }
-.btn-out:active { border-color: #D4AF37; color: #D4AF37; }
-.btn-wa    { background: #25D366; color: #fff; }
-.btn-sm    { padding: 8px 14px; font-size: 13px; }
-.btn-blk   { width: 100%; justify-content: center; }
-.btn-lg    { padding: 14px 24px; font-size: 17px; }
-
-/* ===== UTILITÁRIOS ===== */
-.sp { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.15); border-top-color: #D4AF37; border-radius: 50%; animation: spin 0.6s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-#tc { position: fixed; bottom: 74px; right: 14px; left: 14px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
-.tst { background: #141414; border: 1px solid #2A2A2A; border-radius: 10px; padding: 12px 16px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); animation: tin 0.3s ease, tout 0.3s 2.7s ease forwards; pointer-events: all; }
-.tst-ok   { border-left: 3px solid #10E890; }
-.tst-err  { border-left: 3px solid #FF4D4F; }
-.tst-inf  { border-left: 3px solid #D4AF37; }
-.tst-warn { border-left: 3px solid #F5A623; }
-@keyframes tin  { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-@keyframes tout { to { opacity: 0; transform: translateY(20px); } }
-
-#lb { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 16px; }
-#lb img { max-width: 100%; max-height: 90vh; border-radius: 10px; object-fit: contain; }
-.lbx { position: absolute; top: 14px; right: 14px; background: #141414; border: none; color: #E8EBF2; width: 36px; height: 36px; border-radius: 50%; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-
-.mbk { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
-.mbox { background: #141414; border: 1px solid #2A2A2A; border-radius: 20px; width: 100%; max-width: 300px; padding: 28px 20px; text-align: center; }
-
-/* ===== BOTÃO COMO CHEGAR COM MAPA ===== */
-.btn-maps {
-  position: relative;
-  overflow: hidden;
-  border: 1.5px solid rgba(212,175,55,0.4);
-  background: transparent;
-  color: #E8EBF2;
-  padding: 14px 20px;
-  border-radius: 10px;
-  min-height: 52px;
-}
-.btn-maps:active { opacity: 0.85; }
-
-.maps-bg {
-  position: absolute;
-  inset: 0;
-  background-size: cover;
-  background-position: center;
-  opacity: 0.18;
-  transition: opacity 0.3s;
-  pointer-events: none;
-  border-radius: 8px;
-}
-.btn-maps:hover .maps-bg,
-.btn-maps:active .maps-bg {
-  opacity: 0.28;
+// ============================================================
+// NOTIFICAÇÃO ONESIGNAL — Novo agendamento
+// ============================================================
+async function enviarNotificacaoAgendamento(apt) {
+  try {
+    const msg = `${apt.clienteNome} agendou ${apt.serviceNome} para ${apt.data} às ${apt.hora}`;
+    await fetch('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic os_v2_app_tegoraewsfb2njwjhhz2oaw2obhsof7sb5cubvnnwzu5ykgygt5fqfcfxinhvo6bxxwbjehquc5m3mlg5gop4nd453qxmavh44aqaky'
+      },
+      body: JSON.stringify({
+        app_id: '990ce880-9691-43a6-a6c9-39f3a702da70',
+        filters: [
+          { field: 'tag', key: 'role', relation: '=', value: 'admin' },
+          { operator: 'OR' },
+          { field: 'tag', key: 'specialistId', relation: '=', value: apt.specialistId }
+        ],
+        headings: { pt: '📅 Novo Agendamento!', en: '📅 New Appointment!' },
+        contents: { pt: msg, en: msg },
+        url: 'https://esteticajeautomotiva-netizen.github.io/EsteticaAutomotivaAdm/'
+      })
+    });
+  } catch(e) {
+    console.warn('Notificação não enviada:', e);
+  }
 }
 
-.maps-label {
-  position: relative;
-  z-index: 1;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  justify-content: center;
-  width: 100%;
+async function loadSettings() {
+  try {
+    const doc = await db.collection('settings').doc('horarios').get();
+    if (doc.exists) {
+      state.settings = { ...state.settings, ...doc.data() };
+      const h = document.getElementById('hero-horario');
+      if (h) {
+        h.textContent = state.settings.inicio + '–' + state.settings.fim;
+      }
+    }
+  } catch(e) { console.error(e); }
 }
 
-/* ===== SAFE AREA — CORREÇÃO PWA IPHONE ===== */
-/* Garante que o conteúdo não fique atrás da status bar nem do home indicator */
-.pg {
-  padding-bottom: 8px;
+// ---- Serviços ----
+async function loadServices() {
+  const grid = document.getElementById('services-grid');
+  if (!grid) return;
+  try {
+    const snap = await db.collection('services').where('ativo','==',true).get();
+    state.services = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderServices();
+  } catch(e) {
+    grid.innerHTML = '<div style="color:#FF4D4F;padding:20px;grid-column:1/-1">Erro ao carregar serviços</div>';
+  }
 }
-.hero {
-  padding-top: max(30px, 16px);
+
+function renderServices() {
+  const grid = document.getElementById('services-grid');
+  if (!grid) return;
+  if (!state.services.length) {
+    grid.innerHTML = '<p style="color:#8A9BB8;grid-column:1/-1;padding:20px;text-align:center">Nenhum serviço cadastrado ainda.</p>';
+    return;
+  }
+  grid.innerHTML = state.services.map(s => `
+    <div class="scard" id="sc-${s.id}" onclick="toggleService('${s.id}')">
+      <div class="simg">
+        ${s.fotoUrl ? `<img src="${s.fotoUrl}" alt="${s.nome}" loading="lazy">` : '🚗'}
+        <span class="sdur-badge">⏱ ${s.duracao||30} min</span>
+      </div>
+      <div class="sinf">
+        <div class="snom">${s.nome}</div>
+        <div class="sdesc">${s.descricao || ''}</div>
+        <div class="smeta">
+          <div class="spreco">${s.preco ? 'R$ '+Number(s.preco).toFixed(2) : 'Consultar'}</div>
+        </div>
+      </div>
+    </div>`).join('');
+  updateServiceCards();
+}
+
+// Alterna seleção de serviço (multi-select)
+function toggleService(id) {
+  const svc = state.services.find(s => s.id === id);
+  if (!svc) return;
+
+  const idx = state.selectedServices.findIndex(s => s.id === id);
+  if (idx >= 0) {
+    state.selectedServices.splice(idx, 1); // remove
+  } else {
+    state.selectedServices.push(svc);       // adiciona
+  }
+
+  updateServiceCards();
+  updateServicePreview();
+  if (state.selectedDate) loadSlots();
+  updateBookingSummary();
+}
+
+function updateServiceCards() {
+  const ids = new Set(state.selectedServices.map(s => s.id));
+  document.querySelectorAll('.scard').forEach(c => {
+    const id = c.id.replace('sc-', '');
+    c.classList.toggle('sel', ids.has(id));
+  });
+}
+
+// Calcula totais
+function getTotalDuration() {
+  return state.selectedServices.reduce((acc, s) => acc + (s.duracao || 30), 0);
+}
+function getTotalPrice() {
+  return state.selectedServices.reduce((acc, s) => acc + (Number(s.preco) || 0), 0);
+}
+
+// Preview dos serviços selecionados na aba Agendar
+function updateServicePreview() {
+  const prev = document.getElementById('sum-service-preview');
+  if (!prev) return;
+
+  if (!state.selectedServices.length) {
+    prev.innerHTML = '<span style="color:#8A9BB8;font-size:13px">Nenhum serviço selecionado ainda</span>';
+    return;
+  }
+
+  const total = getTotalDuration();
+  const price = getTotalPrice();
+
+  prev.innerHTML = state.selectedServices.map(s =>
+    `<div class="selected-svc-tag">
+      <span class="svc-nome">${s.nome}</span>
+      <span class="svc-meta">⏱ ${s.duracao||30}min${s.preco ? ' · R$ '+Number(s.preco).toFixed(2) : ''}</span>
+      <button class="svc-rm" onclick="toggleService('${s.id}');event.stopPropagation()">✕</button>
+    </div>`
+  ).join('') +
+  (state.selectedServices.length > 1 ? `
+    <div class="svc-totals">
+      <span>⏱ Total: <strong>${total} min</strong></span>
+      ${price > 0 ? `<span>💰 Total: <strong>R$ ${price.toFixed(2)}</strong></span>` : ''}
+    </div>` : '');
+}
+
+// ---- Especialistas ----
+async function loadSpecialists() {
+  const row = document.getElementById('specialists-row');
+  if (!row) return;
+  try {
+    const snap = await db.collection('specialists').where('ativo','==',true).get();
+    state.specialists = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderSpecialists();
+  } catch(e) { console.error(e); }
+}
+
+function renderSpecialists() {
+  const row = document.getElementById('specialists-row');
+  if (!row) return;
+
+  const todos = `<div class="specc sel" id="spc-any" onclick="selectSpecialist(null)">
+    <img src="https://ui-avatars.com/api/?name=?&background=1A1A1A&color=D4AF37&bold=true&size=52" alt="">
+    <div class="specc-info">
+      <span class="spnome">Qualquer</span>
+      <span class="spesp">Disponível</span>
+    </div>
+  </div>`;
+
+  const cards = state.specialists.map(sp => `
+    <div class="specc" id="spc-${sp.id}" onclick="selectSpecialist('${sp.id}')">
+      <img src="${sp.fotoUrl || 'https://ui-avatars.com/api/?name='+encodeURIComponent(sp.nome)+'&background=1A1A1A&color=D4AF37&bold=true&size=52'}" alt="${sp.nome}">
+      <div class="specc-info">
+        <span class="spnome">${sp.nome.split(' ')[0]}</span>
+        <span class="spesp">${(sp.especialidades||[]).slice(0,2).join(' · ')}</span>
+      </div>
+    </div>`).join('');
+
+  row.innerHTML = todos + cards;
+}
+
+function selectSpecialist(id) {
+  state.selectedSpecialist = id ? state.specialists.find(s => s.id === id) : null;
+  document.querySelectorAll('.specc').forEach(c => c.classList.remove('sel'));
+  const el = id ? document.getElementById('spc-'+id) : document.getElementById('spc-any');
+  if (el) el.classList.add('sel');
+  updateBookingSummary();
+}
+
+// ---- Galeria ----
+async function loadGallery() {
+  const grid = document.getElementById('gallery-grid');
+  if (!grid) return;
+  if (grid.dataset.loaded === 'true') return;
+  grid.dataset.loaded = 'true';
+
+  try {
+    const snap = await db.collection('gallery').orderBy('uploadedAt','desc').limit(10).get();
+    if (snap.empty) {
+      grid.innerHTML = '<p style="grid-column:1/-1;color:#8A9BB8;text-align:center;padding:40px">Galeria em breve...</p>';
+      return;
+    }
+    grid.innerHTML = snap.docs.map(d => {
+      const { fotoUrl, legenda } = d.data();
+      return `<div class="gitem" onclick="openLightbox('${fotoUrl}')"><img src="${fotoUrl}" alt="${legenda||''}" loading="lazy"></div>`;
+    }).join('');
+  } catch(e) { console.error(e); }
+}
+
+function openLightbox(url) {
+  const lb = document.getElementById('lb');
+  lb.querySelector('img').src = url;
+  lb.style.display = 'flex';
+}
+
+// ---- Contato dinâmico ----
+async function loadContactSpecialists() {
+  const container = document.getElementById('contact-specialists');
+  if (!container || container.dataset.loaded === 'true') return;
+  container.dataset.loaded = 'true';
+
+  // Usa especialistas já carregados ou busca novamente
+  let specs = state.specialists;
+  if (!specs.length) {
+    try {
+      const snap = await db.collection('specialists').where('ativo','==',true).get();
+      specs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) { console.error(e); }
+  }
+
+  if (!specs.length) {
+    container.innerHTML = '<p style="color:#8A9BB8;text-align:center;padding:20px">Nenhum especialista cadastrado.</p>';
+    return;
+  }
+
+  container.innerHTML = specs.map(sp => {
+    const foto = sp.fotoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(sp.nome)}&background=1A1F2E&color=D4AF37&bold=true&size=96`;
+    const fone = sp.fone ? sp.fone.replace(/\D/g,'') : '';
+    const waNum = fone.startsWith('55') ? fone : '55' + fone;
+    const msg = encodeURIComponent('Olá, ' + sp.nome.split(' ')[0] + '! Vim pelo site da J&E Estética 🚗');
+    const waLink = fone ? `https://wa.me/${waNum}?text=${msg}` : '#';
+
+    return `
+    <div class="ctcard">
+      <div class="ctav-foto">
+        <img src="${foto}" alt="${sp.nome}" class="ctav-img">
+      </div>
+      <div>
+        <div class="ctnome">${sp.nome}</div>
+        ${sp.especialidades?.length ? `<div class="ctesp">${sp.especialidades.join(' · ')}</div>` : ''}
+        <div class="ctfone">${sp.fone || '—'}</div>
+        <a class="btn btn-wa btn-sm" href="${waLink}" target="_blank" rel="noopener noreferrer">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- Datas ----
+function generateDates() {
+  const container = document.getElementById('date-picker');
+  if (!container) return;
+  const { diasSemana } = state.settings;
+  const dias  = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  container.innerHTML = '';
+  let count = 0;
+
+  for (let i = 0; i < 30 && count < 14; i++) {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    const dow = d.getDay();
+    if (diasSemana && !diasSemana.includes(dow)) continue;
+    count++;
+
+    const iso = d.toISOString().split('T')[0];
+    const btn = document.createElement('button');
+    btn.className = 'dbtn' + (iso === state.selectedDate ? ' sel' : '');
+    btn.setAttribute('data-date', iso);
+    btn.innerHTML = `<span class="dn">${dias[dow]}</span><span class="dd">${d.getDate()}</span><span class="dm">${meses[d.getMonth()]}</span>`;
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.dbtn').forEach(b => b.classList.remove('sel'));
+      btn.classList.add('sel');
+      state.selectedDate = iso;
+      state.selectedTime = null;
+      loadSlots();
+      updateBookingSummary();
+    });
+    container.appendChild(btn);
+  }
+
+  if (count === 0) {
+    container.innerHTML = '<p style="color:#8A9BB8;font-size:13px">Nenhum dia de atendimento configurado.</p>';
+  }
+}
+
+// ---- Slots ----
+async function loadSlots() {
+  const grid = document.getElementById('slots-grid');
+  if (!grid || !state.selectedDate) return;
+  grid.innerHTML = '<span class="sp"></span>';
+
+  const dur = getTotalDuration() || 30;
+  const slots = gerarSlots(state.settings.inicio, state.settings.fim, dur);
+
+  try {
+    // Busca só por data (único where = sem índice composto necessário)
+    // Filtra status em JS para evitar erro de índice com operador 'in'
+    const snap = await db.collection('appointments')
+      .where('data', '==', state.selectedDate)
+      .get();
+
+    const ocupados = new Set();
+    snap.docs.forEach(doc => {
+      const d = doc.data();
+      // Ignora cancelados/concluídos
+      if (d.status === 'cancelado' || d.status === 'concluido') return;
+      const durApt = d.totalDuracao || d.duracao || 30;
+      const startMin = timeToMin(d.hora);
+      slots.forEach(sl => {
+        const slMin = timeToMin(sl);
+        if (slMin >= startMin && slMin < startMin + durApt) {
+          ocupados.add(sl);
+        }
+      });
+    });
+
+    if (!slots.length) {
+      grid.innerHTML = '<p style="color:#8A9BB8;font-size:13px">Nenhum horário disponível.</p>';
+      return;
+    }
+
+    grid.innerHTML = slots.map(t => {
+      const occ = ocupados.has(t);
+      return `<button class="slbtn ${occ ? 'occ' : ''} ${t === state.selectedTime ? 'sel' : ''}"
+        ${occ ? 'disabled' : `onclick="selectTime('${t}')"`}>${t}</button>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = '<p style="color:#FF4D4F">Erro ao carregar horários</p>';
+  }
+}
+
+function timeToMin(time) {
+  if (!time) return 0;
+  const [h, m] = time.split(':').map(Number);
+  return h * 60 + m;
+}
+
+function gerarSlots(inicio, fim, durMin) {
+  const slots = [];
+  let [h, m] = inicio.split(':').map(Number);
+  const [fh, fm] = fim.split(':').map(Number);
+  const fimMin = fh * 60 + fm;
+  while (h * 60 + m + durMin <= fimMin) {
+    slots.push(`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`);
+    m += durMin;
+    if (m >= 60) { h += Math.floor(m/60); m = m % 60; }
+  }
+  return slots;
+}
+
+function selectTime(t) {
+  state.selectedTime = t;
+  document.querySelectorAll('.slbtn').forEach(b => {
+    b.classList.toggle('sel', b.textContent.trim() === t);
+  });
+  updateBookingSummary();
+}
+
+// ---- Resumo ----
+function updateBookingSummary() {
+  updateServicePreview();
+
+  const sp    = state.selectedSpecialist;
+  const d     = state.selectedDate;
+  const t     = state.selectedTime;
+  const price = getTotalPrice();
+  const dur   = getTotalDuration();
+
+  const fmtDate = d
+    ? new Date(d + 'T12:00:00').toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' })
+    : '—';
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+
+  // Resumo de serviços (summary card)
+  const svcEl = document.getElementById('sum-service');
+  if (svcEl) {
+    if (!state.selectedServices.length) {
+      svcEl.textContent = '—';
+    } else if (state.selectedServices.length === 1) {
+      svcEl.textContent = state.selectedServices[0].nome;
+    } else {
+      svcEl.textContent = state.selectedServices.map(s => s.nome).join(', ');
+    }
+  }
+
+  set('sum-specialist', sp?.nome || 'Qualquer especialista');
+  set('sum-date',       fmtDate);
+  set('sum-time',       t || '—');
+
+  const priceEl = document.getElementById('sum-price');
+  if (priceEl) {
+    priceEl.textContent = price > 0 ? 'R$ ' + price.toFixed(2) : '—';
+  }
+
+  const durEl = document.getElementById('sum-duration');
+  if (durEl) {
+    durEl.textContent = dur ? dur + ' min' : '—';
+  }
+}
+
+// ---- Confirmar agendamento ----
+async function confirmBooking() {
+  const nome  = document.getElementById('client-name')?.value?.trim();
+  const fone  = document.getElementById('client-phone')?.value?.trim();
+
+  if (!state.selectedServices.length) { toast('Selecione pelo menos um serviço', 'error'); nav('servicos'); return; }
+  if (!state.selectedDate)            { toast('Selecione uma data', 'error'); return; }
+  if (!state.selectedTime)            { toast('Selecione um horário', 'error'); return; }
+  if (!nome)                          { toast('Informe seu nome', 'error'); return; }
+  if (!fone)                          { toast('Informe seu WhatsApp', 'error'); return; }
+
+  const btn = document.getElementById('btn-confirm-booking');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="sp"></span> Agendando...';
+
+  const totalPreco   = getTotalPrice();
+  const totalDuracao = getTotalDuration();
+  const serviceNome  = state.selectedServices.map(s => s.nome).join(', ');
+  const serviceIds   = state.selectedServices.map(s => s.id);
+
+  try {
+    await db.collection('appointments').add({
+      clienteNome:    nome,
+      clienteFone:    fone,
+      // Compatibilidade: guarda o primeiro serviço no campo legado + array completo
+      serviceId:      state.selectedServices[0].id,
+      serviceNome:    serviceNome,
+      services:       state.selectedServices.map(s => ({ id: s.id, nome: s.nome, preco: s.preco || 0, duracao: s.duracao || 30 })),
+      serviceIds,
+      specialistId:   state.selectedSpecialist?.id || null,
+      specialistNome: state.selectedSpecialist?.nome || 'A definir',
+      data:           state.selectedDate,
+      hora:           state.selectedTime,
+      preco:          totalPreco,
+      totalDuracao:   totalDuracao,
+      status:         'pendente',
+      createdAt:      firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Enviar notificação push para ADM e Especialista
+    enviarNotificacaoAgendamento({
+      clienteNome:  nome,
+      serviceNome:  serviceNome,
+      data:         state.selectedDate,
+      hora:         state.selectedTime,
+      specialistId: state.selectedSpecialist?.id || null
+    }).catch(() => {});
+
+    // Reset
+    state.selectedServices = [];
+    state.selectedTime     = null;
+    state.selectedDate     = null;
+    document.getElementById('client-name').value  = '';
+    document.getElementById('client-phone').value = '';
+    updateServiceCards();
+    generateDates();
+    updateBookingSummary();
+    document.getElementById('modal-ok').style.display = 'flex';
+
+  } catch(e) {
+    toast('Erro ao agendar. Tente novamente.', 'error');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🎯 Confirmar Agendamento';
+  }
+}
+
+// ---- WhatsApp ----
+function setupWhatsApp() {
+  // Os números hardcoded em index.html continuam funcionando
+  const nums = { edielson: '5511949322857', jadson: '5511943324633' };
+  const msg  = encodeURIComponent('Olá! Vim pelo site e gostaria de falar com um especialista 🚗');
+  document.querySelectorAll('[data-whatsapp]').forEach(el => {
+    const num = nums[el.getAttribute('data-whatsapp')] || nums.edielson;
+    el.href   = `https://wa.me/${num}?text=${msg}`;
+    el.target = '_blank';
+    el.rel    = 'noopener noreferrer';
+  });
+}
+
+// ---- Google Maps ----
+function setupMaps() {
+  const end = 'Av+Alfredo+Barbosa,+1853+Jardim+Palmira+Guarulhos+SP';
+  document.querySelectorAll('[data-maps]').forEach(el => {
+    el.href   = `https://www.google.com/maps/search/?api=1&query=${end}`;
+    el.target = '_blank';
+    el.rel    = 'noopener noreferrer';
+  });
 }
