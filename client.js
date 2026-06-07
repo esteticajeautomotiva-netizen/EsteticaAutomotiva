@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ---- Configurações ----
 
 // ============================================================
-// NOTIFICAÇÃO PUSH — Novo agendamento
+// NOTIFICAÇÃO ONESIGNAL — Novo agendamento
 // ============================================================
 async function enviarNotificacaoAgendamento(apt) {
   try {
@@ -71,14 +71,13 @@ async function enviarNotificacaoAgendamento(apt) {
       body: JSON.stringify({
         app_id: '990ce880-9691-43a6-a6c9-39f3a702da70',
         included_segments: ['Total Subscriptions'],
-        headings: { pt: '📅 Novo Agendamento!' },
-        contents: { pt: msg },
+        headings: { pt: '📅 Novo Agendamento!', en: '📅 New Appointment!' },
+        contents: { pt: msg, en: msg },
         url: 'https://esteticajeautomotiva-netizen.github.io/EsteticaAutomotivaAdm/'
       })
     });
-    console.log('[Push] Notificação enviada para todos os assinantes');
   } catch(e) {
-    console.warn('[Push] Erro ao enviar notificação:', e);
+    console.warn('Notificação não enviada:', e);
   }
 }
 
