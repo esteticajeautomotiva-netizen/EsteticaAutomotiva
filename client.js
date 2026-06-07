@@ -55,6 +55,33 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ---- Configurações ----
+
+// ============================================================
+// NOTIFICAÇÃO PUSH — Novo agendamento
+// ============================================================
+async function enviarNotificacaoAgendamento(apt) {
+  try {
+    const msg = `${apt.clienteNome} agendou ${apt.serviceNome} para ${apt.data} às ${apt.hora}`;
+    await fetch('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Basic os_v2_app_tegoraewsfb2njwjhhz2oaw2obhsof7sb5cubvnnwzu5ykgygt5fqfcfxinhvo6bxxwbjehquc5m3mlg5gop4nd453qxmavh44aqaky'
+      },
+      body: JSON.stringify({
+        app_id: '990ce880-9691-43a6-a6c9-39f3a702da70',
+        included_segments: ['Total Subscriptions'],
+        headings: { pt: '📅 Novo Agendamento!' },
+        contents: { pt: msg },
+        url: 'https://esteticajeautomotiva-netizen.github.io/EsteticaAutomotivaAdm/'
+      })
+    });
+    console.log('[Push] Notificação enviada para todos os assinantes');
+  } catch(e) {
+    console.warn('[Push] Erro ao enviar notificação:', e);
+  }
+}
+
 async function loadSettings() {
   try {
     const doc = await db.collection('settings').doc('horarios').get();
@@ -355,18 +382,10 @@ async function loadSlots() {
       return;
     }
 
-    // Verifica horários passados para o dia de hoje
-    const nowDate = new Date();
-    const todayStr = nowDate.toISOString().split('T')[0];
-    const isToday = state.selectedDate === todayStr;
-    const nowMin = isToday ? nowDate.getHours() * 60 + nowDate.getMinutes() : -1;
-
     grid.innerHTML = slots.map(t => {
       const occ = ocupados.has(t);
-      const past = isToday && timeToMin(t) <= nowMin;
-      const off = occ || past;
-      return `<button class="slbtn ${occ ? 'occ' : ''} ${past ? 'past' : ''} ${t === state.selectedTime ? 'sel' : ''}"
-        ${off ? 'disabled' : `onclick="selectTime('${t}')"`}>${t}</button>`;
+      return `<button class="slbtn ${occ ? 'occ' : ''} ${t === state.selectedTime ? 'sel' : ''}"
+        ${occ ? 'disabled' : `onclick="selectTime('${t}')"`}>${t}</button>`;
     }).join('');
   } catch(e) {
     grid.innerHTML = '<p style="color:#FF4D4F">Erro ao carregar horários</p>';
@@ -481,6 +500,15 @@ async function confirmBooking() {
       status:         'pendente',
       createdAt:      firebase.firestore.FieldValue.serverTimestamp()
     });
+
+    // Enviar notificação push para ADM e Especialista
+    enviarNotificacaoAgendamento({
+      clienteNome:  nome,
+      serviceNome:  serviceNome,
+      data:         state.selectedDate,
+      hora:         state.selectedTime,
+      specialistId: state.selectedSpecialist?.id || null
+    }).catch(() => {});
 
     // Reset
     state.selectedServices = [];
