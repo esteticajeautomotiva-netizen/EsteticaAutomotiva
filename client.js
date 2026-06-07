@@ -500,15 +500,6 @@ async function confirmBooking() {
       createdAt:      firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Enviar notificação push para ADM e Especialista
-    enviarNotificacaoAgendamento({
-      clienteNome:  nome,
-      serviceNome:  serviceNome,
-      data:         state.selectedDate,
-      hora:         state.selectedTime,
-      specialistId: state.selectedSpecialist?.id || null
-    }).catch(() => {});
-
     // Reset
     state.selectedServices = [];
     state.selectedTime     = null;
