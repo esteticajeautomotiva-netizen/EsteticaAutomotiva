@@ -62,21 +62,41 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function enviarNotificacaoAgendamento(apt) {
   try {
     const msg = `${apt.clienteNome} agendou ${apt.serviceNome} para ${apt.data} às ${apt.hora}`;
+
+    // Monta os filtros corretamente
+    // Sempre notifica admins
+    // Se tiver especialista definido, notifica ele também via OR
+    let filters;
+    if (apt.specialistId) {
+      filters = [
+        { field: 'tag', key: 'role', relation: '=', value: 'admin' },
+        { operator: 'OR' },
+        { field: 'tag', key: 'specialistId', relation: '=', value: apt.specialistId }
+      ];
+    } else {
+      // Sem especialista: notifica só admins e todos os especialistas
+      filters = [
+        { field: 'tag', key: 'role', relation: '=', value: 'admin' },
+        { operator: 'OR' },
+        { field: 'tag', key: 'role', relation: '=', value: 'specialist' }
+      ];
+    }
+
     const resp = await fetch('https://je-push.esteticajeautomotiva.workers.dev/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         app_id: '990ce880-9691-43a6-a6c9-39f3a702da70',
-        included_segments: ['Total Subscriptions'],
-        headings: { pt: '📅 Novo Agendamento!' },
-        contents: { pt: msg },
+        filters,
+        headings: { pt: '📅 Novo Agendamento!', en: '📅 New Appointment!' },
+        contents: { pt: msg, en: msg },
         url: 'https://esteticajeautomotiva-netizen.github.io/EsteticaAutomotivaAdm/'
       })
     });
     const data = await resp.json();
     console.log('[Push] Enviado:', data);
   } catch(e) {
-    console.warn('[Push] Erro:', e);
+    console.warn('[Push] Notificação não enviada:', e);
   }
 }
 
