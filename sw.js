@@ -1,11 +1,17 @@
-const CACHE_NAME = 'je-adm-v8';
-const BASE = '/EsteticaAutomotivaAdm';
+const CACHE_NAME = 'je-cliente-v6';
+const BASE = '/EsteticaAutomotiva';
 const ASSETS = [
-  `${BASE}/index.html`, `${BASE}/login.html`, `${BASE}/admin.html`,
-  `${BASE}/manifest.json`, `${BASE}/vars.css`, `${BASE}/admin.css`,
-  `${BASE}/firebase-config.js`, `${BASE}/cloudinary.js`,
-  `${BASE}/auth.js`, `${BASE}/admin.js`,
-  `${BASE}/icon-192.png`, `${BASE}/icon-512.png`
+  `${BASE}/index.html`,
+  `${BASE}/login.html`,
+  `${BASE}/manifest.json`,
+  `${BASE}/vars.css`,
+  `${BASE}/client.css`,
+  `${BASE}/firebase-config.js`,
+  `${BASE}/cloudinary.js`,
+  `${BASE}/auth.js`,
+  `${BASE}/client.js`,
+  `${BASE}/icon-192.png`,
+  `${BASE}/icon-512.png`
 ];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()).catch(() => self.skipWaiting()));
@@ -17,15 +23,18 @@ self.addEventListener('fetch', e => {
   const url = e.request.url;
   if (url.includes('firestore.googleapis.com') || url.includes('identitytoolkit') ||
       url.includes('cloudinary.com') || url.includes('googleapis.com') ||
-      url.includes('gstatic.com') || url.includes('onesignal.com')) return;
-  e.respondWith(caches.match(e.request).then(cached => {
-    if (cached) return cached;
-    return fetch(e.request).then(r => {
-      if (r && r.status === 200 && r.type === 'basic') {
-        const clone = r.clone();
-        caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
-      }
-      return r;
-    }).catch(() => caches.match(`${BASE}/admin.html`));
-  }));
+      url.includes('gstatic.com') || url.includes('onesignal.com') ||
+      url.includes('workers.dev')) return;
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(r => {
+        if (r && r.status === 200 && r.type === 'basic') {
+          const clone = r.clone();
+          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+        }
+        return r;
+      }).catch(() => caches.match(`${BASE}/index.html`));
+    })
+  );
 });
